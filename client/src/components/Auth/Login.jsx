@@ -22,33 +22,56 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-surface-950 p-4">
+      <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-6xl">💰</span>
-          <h1 className="text-3xl font-bold mt-4 bg-gradient-to-r from-accent-400 to-purple-400 bg-clip-text text-transparent">
-            Daily Expense Tracker
-          </h1>
-          <p className="text-white/60 mt-2">Track your spending like a boss</p>
+          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-white">DailyExpense</h1>
+          <p className="text-surface-400 mt-1 text-sm">Track your spending with clarity</p>
         </div>
-        <form onSubmit={handleSubmit} className="glass p-8 space-y-5">
-          <h2 className="text-2xl font-bold text-center">Welcome Back</h2>
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Email</label>
-            <input type="email" className="input-field" placeholder="you@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Password</label>
-            <input type="password" className="input-field" placeholder="••••••••" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
-          </div>
-          <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2">
-            {loading && <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>}
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-          <p className="text-center text-white/60 text-sm">
-            Don't have an account? <Link to="/register" className="text-accent-400 hover:text-accent-300 font-medium">Register</Link>
+        <div className="card p-6">
+          <h2 className="text-lg font-semibold text-white mb-5">Sign in to your account</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-1.5">Email</label>
+              <input
+                type="email"
+                className="input-field"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-surface-300 mb-1.5">Password</label>
+              <input
+                type="password"
+                className="input-field"
+                placeholder="Enter your password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full flex items-center justify-center gap-2"
+            >
+              {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+          <p className="text-center text-surface-400 text-sm mt-5">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-blue-400 hover:text-blue-300 font-medium">Register</Link>
           </p>
-        </form>
+        </div>
       </div>
     </div>
   );

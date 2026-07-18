@@ -34,7 +34,7 @@ export default function ExpenseForm({ expense, onClose, onSaved }) {
         toast.success('Expense updated!');
       } else {
         await expenseAPI.create(data);
-        toast.success('Expense added! 💸');
+        toast.success('Expense added!');
       }
       onSaved();
     } catch (err) {
@@ -45,51 +45,89 @@ export default function ExpenseForm({ expense, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="glass-dark p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">{expense ? 'Edit Expense' : 'Add Expense'}</h2>
-          <button onClick={onClose} className="text-white/60 hover:text-white">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-surface-800">
+          <h2 className="text-base font-semibold text-white">{expense ? 'Edit Expense' : 'New Expense'}</h2>
+          <button onClick={onClose} className="text-surface-400 hover:text-white transition-colors p-1 rounded-md hover:bg-surface-800">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Title</label>
-            <input type="text" className="input-field" placeholder="What did you spend on?" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+            <label className="block text-sm font-medium text-surface-300 mb-1.5">Title</label>
+            <input
+              type="text"
+              className="input-field"
+              placeholder="What did you spend on?"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              required
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Amount (Rs.)</label>
-              <input type="number" className="input-field" placeholder="0" step="0.01" min="0" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} required />
+              <label className="block text-sm font-medium text-surface-300 mb-1.5">Amount (Rs.)</label>
+              <input
+                type="number"
+                className="input-field"
+                placeholder="0"
+                step="0.01"
+                min="0"
+                value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                required
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Date</label>
-              <input type="date" className="input-field" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+              <label className="block text-sm font-medium text-surface-300 mb-1.5">Date</label>
+              <input
+                type="date"
+                className="input-field"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                required
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Category</label>
-              <select className="input-field" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+              <label className="block text-sm font-medium text-surface-300 mb-1.5">Category</label>
+              <select
+                className="input-field"
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+              >
                 {categories.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1">Payment Method</label>
-              <select className="input-field" value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
+              <label className="block text-sm font-medium text-surface-300 mb-1.5">Payment Method</label>
+              <select
+                className="input-field"
+                value={form.paymentMethod}
+                onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}
+              >
                 {paymentMethods.map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1">Notes</label>
-            <textarea className="input-field" rows="3" placeholder="Any extra details..." value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+            <label className="block text-sm font-medium text-surface-300 mb-1.5">Notes</label>
+            <textarea
+              className="input-field"
+              rows="3"
+              placeholder="Any extra details..."
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            />
           </div>
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>
             <button type="submit" disabled={loading} className="btn-primary flex-1 flex items-center justify-center gap-2">
-              {loading && <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>}
+              {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               {loading ? 'Saving...' : expense ? 'Update' : 'Add Expense'}
             </button>
           </div>

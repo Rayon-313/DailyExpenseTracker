@@ -14,11 +14,19 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Toaster
           position="top-right"
           toastOptions={{
+            duration: 3000,
             style: {
-              background: '#1e1b4b',
-              color: '#fff',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '12px',
+              background: '#1e293b',
+              color: '#f8fafc',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              fontSize: '14px',
+            },
+            success: {
+              iconTheme: { primary: '#3b82f6', secondary: '#f8fafc' },
+            },
+            error: {
+              iconTheme: { primary: '#ef4444', secondary: '#f8fafc' },
             },
           }}
         />

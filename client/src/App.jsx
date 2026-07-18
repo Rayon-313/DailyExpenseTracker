@@ -8,13 +8,25 @@ import Dashboard from './components/Dashboard/Dashboard';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-accent-500"></div></div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-surface-950">
+        <div className="w-8 h-8 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
   return user ? children : <Navigate to="/login" />;
 }
 
 function PublicRoute({ children }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-accent-500"></div></div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-surface-950">
+        <div className="w-8 h-8 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
   return user ? <Navigate to="/" /> : children;
 }
 
