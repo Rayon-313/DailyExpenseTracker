@@ -1,12 +1,39 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { expenseAPI } from '../../services/api';
+import toast from 'react-hot-toast';
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [budgetData, setBudgetData] = useState(null);
   const mobileRef = useRef(null);
+  const notifiedRef = useRef(false);
+
+  useEffect(() => {
+    expenseAPI.getDashboard()
+      .then((res) => {
+        setBudgetData({
+          budget: res.data.monthlyBudget,
+          spent: res.data.currentMonthTotal,
+          percentage: res.data.budgetPercentage,
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (budgetData && budgetData.budget > 0 && budgetData.percentage >= 70 && !notifiedRef.current) {
+      notifiedRef.current = true;
+      if (budgetData.percentage >= 100) {
+        toast.error(`Monthly budget exceeded! You've spent Rs. ${budgetData.spent.toLocaleString()} of Rs. ${budgetData.budget.toLocaleString()}`, { duration: 5000 });
+      } else {
+        toast(`Warning: You've used ${budgetData.percentage}% of your monthly budget`, { icon: '⚠️', duration: 4000 });
+      }
+    }
+  }, [budgetData]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -30,10 +57,19 @@ export default function Layout() {
         : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800'
     }`;
 
+  const getBarColor = () => {
+    if (!budgetData || budgetData.budget <= 0) return 'bg-blue-500';
+    if (budgetData.percentage >= 100) return 'bg-red-500';
+    if (budgetData.percentage >= 70) return 'bg-amber-500';
+    return 'bg-blue-500';
+  };
+
+  const hasBudget = budgetData && budgetData.budget > 0;
+
   return (
     <div className="min-h-screen bg-surface-950">
-      <nav className="sticky top-0 z-50 bg-surface-950/80 backdrop-blur-md border-b border-surface-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <header className="sticky top-0 z-50 bg-surface-950/80 backdrop-blur-md border-b border-surface-800">
+        <nav className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             <NavLink to="/" className="flex items-center gap-2.5 text-base font-semibold text-white no-underline">
               <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -85,7 +121,7 @@ export default function Layout() {
               </svg>
             </button>
           </div>
-        </div>
+        </nav>
 
         {mobileOpen && (
           <div ref={mobileRef} className="sm:hidden border-t border-surface-800 bg-surface-900/95 backdrop-blur-md">
@@ -117,7 +153,29 @@ export default function Layout() {
             </div>
           </div>
         )}
-      </nav>
+
+        {hasBudget && (
+          <div className="border-t border-surface-800">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-medium text-surface-400 whitespace-nowrap">Budget</span>
+                <div className="flex-1">
+                  <div className="h-1.5 bg-surface-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${getBarColor()}`}
+                      style={{ width: `${Math.min(budgetData.percentage, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <span className={`text-xs font-medium tabular-nums whitespace-nowrap ${budgetData.percentage >= 100 ? 'text-red-400' : budgetData.percentage >= 70 ? 'text-amber-400' : 'text-surface-400'}`}>
+                  Rs. {budgetData.spent.toLocaleString()} / {budgetData.budget.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         <Outlet />
       </main>

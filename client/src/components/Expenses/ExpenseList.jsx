@@ -16,13 +16,27 @@ const categoryStyles = {
   Other: { color: 'text-surface-400', bg: 'bg-surface-700/50', border: 'border-surface-600/20' },
 };
 
+function getMonthOptions(expenses) {
+  const months = new Map();
+  expenses.forEach((e) => {
+    const d = new Date(e.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!months.has(key)) {
+      months.set(key, d.toLocaleString('default', { month: 'long', year: 'numeric' }));
+    }
+  });
+  return Array.from(months.entries()).map(([value, label]) => ({ value, label }));
+}
+
 export default function ExpenseList() {
-  const [expenses, setExpenses] = useState([]);
+  const [allExpenses, setAllExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
@@ -30,7 +44,7 @@ export default function ExpenseList() {
       const params = { ...filters };
       if (search) params.search = search;
       const res = await expenseAPI.getAll(params);
-      setExpenses(res.data);
+      setAllExpenses(res.data);
     } catch (err) {
       toast.error('Failed to load expenses');
     } finally {
@@ -57,14 +71,29 @@ export default function ExpenseList() {
     return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const monthOptions = getMonthOptions(allExpenses);
+
+  const filteredExpenses = allExpenses.filter((e) => {
+    if (selectedMonth === 'all') return true;
+    const d = new Date(e.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    return key === selectedMonth;
+  }).sort((a, b) => {
+    if (sortOrder === 'newest') return new Date(b.date) - new Date(a.date);
+    if (sortOrder === 'oldest') return new Date(a.date) - new Date(b.date);
+    if (sortOrder === 'highest') return b.amount - a.amount;
+    if (sortOrder === 'lowest') return a.amount - b.amount;
+    return 0;
+  });
+
+  const total = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Expenses</h1>
-          <p className="text-surface-400 text-sm mt-0.5">{expenses.length} transaction{expenses.length !== 1 ? 's' : ''}</p>
+          <p className="text-surface-400 text-sm mt-0.5">{filteredExpenses.length} transaction{filteredExpenses.length !== 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={() => { setEditingExpense(null); setShowForm(true); }}
@@ -82,9 +111,49 @@ export default function ExpenseList() {
         <FilterPanel filters={filters} onFilterChange={setFilters} />
       </div>
 
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setSelectedMonth('all')}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ${
+            selectedMonth === 'all'
+              ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
+              : 'bg-surface-900 border border-surface-800 text-surface-400 hover:text-surface-200'
+          }`}
+        >
+          All Months
+        </button>
+        {monthOptions.map(({ value, label }) => (
+          <button
+            key={value}
+            onClick={() => setSelectedMonth(value)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ${
+              selectedMonth === value
+                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
+                : 'bg-surface-900 border border-surface-800 text-surface-400 hover:text-surface-200'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+        <div className="ml-auto">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="input-field !py-1.5 !px-3 text-xs w-auto"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="highest">Highest amount</option>
+            <option value="lowest">Lowest amount</option>
+          </select>
+        </div>
+      </div>
+
       {total > 0 && (
         <div className="card px-5 py-3.5 flex items-center justify-between">
-          <span className="text-sm text-surface-400">Total Spent</span>
+          <span className="text-sm text-surface-400">
+            {selectedMonth === 'all' ? 'Total' : 'Month Total'}
+          </span>
           <span className="text-lg font-bold text-white">Rs. {total.toLocaleString()}</span>
         </div>
       )}
@@ -93,19 +162,23 @@ export default function ExpenseList() {
         <div className="flex justify-center py-16">
           <div className="w-7 h-7 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
         </div>
-      ) : expenses.length === 0 ? (
+      ) : filteredExpenses.length === 0 ? (
         <div className="card py-16 text-center px-6">
           <div className="w-14 h-14 rounded-full bg-surface-800 flex items-center justify-center mx-auto mb-4">
             <svg className="w-7 h-7 text-surface-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-16.5 0v4.5A2.25 2.25 0 006.75 20.25h10.5A2.25 2.25 0 0019.5 18v-4.5m-16.5 0V6.75a2.25 2.25 0 012.25-2.25h10.5a2.25 2.25 0 012.25 2.25v6.75" />
             </svg>
           </div>
-          <p className="text-base font-medium text-white">No expenses yet</p>
-          <p className="text-sm text-surface-400 mt-1">Add your first expense to start tracking</p>
+          <p className="text-base font-medium text-white">
+            {selectedMonth === 'all' ? 'No expenses yet' : 'No expenses for this month'}
+          </p>
+          <p className="text-sm text-surface-400 mt-1">
+            {selectedMonth === 'all' ? 'Add your first expense to start tracking' : 'Try selecting a different month'}
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
-          {expenses.map((expense) => {
+          {filteredExpenses.map((expense) => {
             const cat = categoryStyles[expense.category] || categoryStyles.Other;
             return (
               <div key={expense._id} className="card px-4 py-3 flex items-center gap-3 hover:border-surface-700 transition-colors duration-150 group">

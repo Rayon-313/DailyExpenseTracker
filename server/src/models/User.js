@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+  monthlyBudget: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

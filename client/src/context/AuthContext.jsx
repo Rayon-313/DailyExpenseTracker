@@ -35,6 +35,12 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
+  const updateBudget = async (monthlyBudget) => {
+    const res = await authAPI.updateBudget(monthlyBudget);
+    setUser(res.data.user);
+    return res.data;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -42,7 +48,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateBudget, logout }}>
       {children}
     </AuthContext.Provider>
   );

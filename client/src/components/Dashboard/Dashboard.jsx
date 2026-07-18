@@ -1,20 +1,46 @@
 import { useState, useEffect } from 'react';
 import { expenseAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import toast from 'react-hot-toast';
 
 const COLORS = ['#3b82f6', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1'];
 
 export default function Dashboard() {
+  const { user, updateBudget } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [budgetInput, setBudgetInput] = useState(user?.monthlyBudget || '');
+  const [budgetSaving, setBudgetSaving] = useState(false);
 
   useEffect(() => {
     expenseAPI.getDashboard()
-      .then((res) => setData(res.data))
+      .then((res) => {
+        setData(res.data);
+        if (res.data.monthlyBudget > 0 && !budgetInput) {
+          setBudgetInput(res.data.monthlyBudget);
+        }
+      })
       .catch(() => toast.error('Failed to load dashboard'))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSaveBudget = async () => {
+    const amount = parseFloat(budgetInput);
+    if (isNaN(amount) || amount < 0) {
+      return toast.error('Please enter a valid amount');
+    }
+    setBudgetSaving(true);
+    try {
+      await updateBudget(amount);
+      setData((prev) => prev ? { ...prev, monthlyBudget: amount, budgetRemaining: amount - prev.currentMonthTotal } : prev);
+      toast.success('Budget updated');
+    } catch (err) {
+      toast.error('Failed to update budget');
+    } finally {
+      setBudgetSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -28,6 +54,26 @@ export default function Dashboard() {
     return (
       <div className="space-y-5">
         <h1 className="text-xl font-bold text-white">Dashboard</h1>
+        <div className="card p-6">
+          <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
+          <p className="text-xs text-surface-400 mb-4">Set a budget to track your spending limit each month</p>
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 max-w-xs">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-surface-500">Rs.</span>
+              <input
+                type="number"
+                className="input-field pl-10"
+                placeholder="0"
+                min="0"
+                value={budgetInput}
+                onChange={(e) => setBudgetInput(e.target.value)}
+              />
+            </div>
+            <button onClick={handleSaveBudget} disabled={budgetSaving} className="btn-primary">
+              {budgetSaving ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </div>
         <div className="card py-16 text-center px-6">
           <div className="w-14 h-14 rounded-full bg-surface-800 flex items-center justify-center mx-auto mb-4">
             <svg className="w-7 h-7 text-surface-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -52,9 +98,59 @@ export default function Dashboard() {
     value,
   }));
 
+  const budgetPct = data.budgetPercentage || 0;
+  const budgetBarColor = budgetPct >= 100 ? 'bg-red-500' : budgetPct >= 70 ? 'bg-amber-500' : 'bg-blue-500';
+
   return (
     <div className="space-y-5">
       <h1 className="text-xl font-bold text-white">Dashboard</h1>
+
+      <div className="card p-6">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+          <div className="flex-1">
+            <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
+            <p className="text-xs text-surface-400">
+              {data.monthlyBudget > 0
+                ? `Rs. ${data.budgetRemaining > 0 ? data.budgetRemaining.toLocaleString() : '0'} remaining this month`
+                : 'Set a budget to track your spending'}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-surface-500">Rs.</span>
+              <input
+                type="number"
+                className="input-field pl-10 !w-40"
+                placeholder="0"
+                min="0"
+                value={budgetInput}
+                onChange={(e) => setBudgetInput(e.target.value)}
+              />
+            </div>
+            <button onClick={handleSaveBudget} disabled={budgetSaving} className="btn-primary">
+              {budgetSaving ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </div>
+        {data.monthlyBudget > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs text-surface-400">
+                Rs. {data.currentMonthTotal.toLocaleString()} spent
+              </span>
+              <span className={`text-xs font-medium ${budgetPct >= 100 ? 'text-red-400' : budgetPct >= 70 ? 'text-amber-400' : 'text-surface-400'}`}>
+                {budgetPct}%
+              </span>
+            </div>
+            <div className="w-full h-2 bg-surface-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${budgetBarColor}`}
+                style={{ width: `${Math.min(budgetPct, 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="card p-5">
