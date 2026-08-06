@@ -11,7 +11,7 @@ function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-surface-950">
-        <div className="w-8 h-8 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -23,7 +23,7 @@ function PublicRoute({ children }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-surface-950">
-        <div className="w-8 h-8 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
       </div>
     );
   }

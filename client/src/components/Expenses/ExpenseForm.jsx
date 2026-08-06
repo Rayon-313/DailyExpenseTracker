@@ -45,10 +45,10 @@ export default function ExpenseForm({ expense, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-surface-900 border border-surface-700 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b border-surface-800">
-          <h2 className="text-base font-semibold text-white">{expense ? 'Edit Expense' : 'New Expense'}</h2>
+          <div><p className="text-brand-300 text-[11px] font-semibold uppercase tracking-[.16em] mb-1">Personal ledger</p><h2 className="page-title text-xl font-bold text-white">{expense ? 'Edit expense' : 'Add an expense'}</h2></div>
           <button onClick={onClose} className="text-surface-400 hover:text-white transition-colors p-1 rounded-md hover:bg-surface-800">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -53,34 +53,34 @@ export default function Layout() {
   const linkClass = ({ isActive }) =>
     `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ${
       isActive
-        ? 'bg-blue-600/15 text-blue-400'
+        ? 'bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/20'
         : 'text-surface-400 hover:text-surface-200 hover:bg-surface-800'
     }`;
 
   const getBarColor = () => {
-    if (!budgetData || budgetData.budget <= 0) return 'bg-blue-500';
+    if (!budgetData || budgetData.budget <= 0) return 'bg-brand-500';
     if (budgetData.percentage >= 100) return 'bg-red-500';
     if (budgetData.percentage >= 70) return 'bg-amber-500';
-    return 'bg-blue-500';
+    return 'bg-brand-500';
   };
 
   const hasBudget = budgetData && budgetData.budget > 0;
 
   return (
     <div className="min-h-screen bg-surface-950">
-      <header className="sticky top-0 z-50 bg-surface-950/80 backdrop-blur-md border-b border-surface-800">
+      <header className="sticky top-0 z-50 bg-surface-950/85 backdrop-blur-xl border-b border-surface-800">
         <nav className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14">
-            <NavLink to="/" className="flex items-center gap-2.5 text-base font-semibold text-white no-underline">
-              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
+          <div className="flex items-center justify-between h-16">
+            <NavLink to="/" className="flex items-center gap-3 text-base font-semibold text-white no-underline">
+              <div className="w-9 h-9 bg-brand-500 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-600/30 rotate-[-4deg]">
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <span>DailyExpense</span>
+              <span className="page-title text-xl tracking-tight">paisa.</span>
             </NavLink>
 
-            <div className="hidden sm:flex items-center gap-1">
+            <div className="hidden sm:flex items-center gap-1 rounded-xl bg-surface-900/70 border border-surface-800 p-1">
               <NavLink to="/" end className={linkClass}>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -97,7 +97,7 @@ export default function Layout() {
 
             <div className="hidden sm:flex items-center gap-3">
               <div className="flex items-center gap-2.5 pl-3 border-l border-surface-800">
-                <div className="w-7 h-7 rounded-full bg-surface-800 border border-surface-700 flex items-center justify-center text-xs font-medium text-surface-300">
+                <div className="w-8 h-8 rounded-full bg-brand-500/15 border border-brand-500/20 flex items-center justify-center text-xs font-semibold text-brand-300">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm text-surface-400 max-w-[100px] truncate">{user?.name}</span>
@@ -140,7 +140,7 @@ export default function Layout() {
               </NavLink>
               <div className="border-t border-surface-800 my-2" />
               <div className="flex items-center gap-2.5 px-3 py-2">
-                <div className="w-7 h-7 rounded-full bg-surface-800 border border-surface-700 flex items-center justify-center text-xs font-medium text-surface-300">
+                <div className="w-8 h-8 rounded-full bg-brand-500/15 border border-brand-500/20 flex items-center justify-center text-xs font-semibold text-brand-300">
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm text-surface-400 flex-1 truncate">{user?.name}</span>
@@ -158,7 +158,7 @@ export default function Layout() {
           <div className="border-t border-surface-800">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-medium text-surface-400 whitespace-nowrap">Budget</span>
+                <span className="text-xs font-semibold uppercase tracking-[.14em] text-surface-400 whitespace-nowrap">This month</span>
                 <div className="flex-1">
                   <div className="h-1.5 bg-surface-800 rounded-full overflow-hidden">
                     <div
@@ -176,7 +176,7 @@ export default function Layout() {
         )}
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <Outlet />
       </main>
     </div>

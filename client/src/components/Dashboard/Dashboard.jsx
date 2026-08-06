@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import toast from 'react-hot-toast';
 
-const COLORS = ['#3b82f6', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1'];
+const COLORS = ['#ed6534', '#d6a252', '#699b80', '#a17aaf', '#5d93a8', '#d16f75', '#c37c55', '#84936b'];
 
 export default function Dashboard() {
   const { user, updateBudget } = useAuth();
@@ -45,7 +45,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex justify-center py-16">
-        <div className="w-7 h-7 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-7 h-7 border-2 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -53,7 +53,7 @@ export default function Dashboard() {
   if (!data || data.count === 0) {
     return (
       <div className="space-y-5">
-        <h1 className="text-xl font-bold text-white">Dashboard</h1>
+        <div><p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Money, in context</p><h1 className="page-title text-3xl font-bold text-white">Your spending story</h1></div>
         <div className="card p-6">
           <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
           <p className="text-xs text-surface-400 mb-4">Set a budget to track your spending limit each month</p>
@@ -99,13 +99,13 @@ export default function Dashboard() {
   }));
 
   const budgetPct = data.budgetPercentage || 0;
-  const budgetBarColor = budgetPct >= 100 ? 'bg-red-500' : budgetPct >= 70 ? 'bg-amber-500' : 'bg-blue-500';
+  const budgetBarColor = budgetPct >= 100 ? 'bg-red-500' : budgetPct >= 70 ? 'bg-amber-500' : 'bg-brand-500';
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-xl font-bold text-white">Dashboard</h1>
+    <div className="space-y-6">
+      <div><p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Money, in context</p><h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Your spending story</h1></div>
 
-      <div className="card p-6">
+      <div className="card p-6 border-brand-500/20 bg-gradient-to-br from-brand-500/10 to-surface-900/80">
         <div className="flex flex-col sm:flex-row sm:items-end gap-4">
           <div className="flex-1">
             <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
@@ -154,17 +154,17 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="card p-5">
-          <p className="text-xs font-medium text-surface-400 uppercase tracking-wide">Total Expenses</p>
+          <p className="text-xs font-medium text-surface-400 uppercase tracking-[.12em]">Total Expenses</p>
           <p className="text-2xl font-bold text-white mt-2">{data.count}</p>
           <p className="text-xs text-surface-500 mt-0.5">transactions</p>
         </div>
         <div className="card p-5">
-          <p className="text-xs font-medium text-surface-400 uppercase tracking-wide">Total Spent</p>
-          <p className="text-2xl font-bold text-blue-400 mt-2">Rs. {data.total.toLocaleString()}</p>
+          <p className="text-xs font-medium text-surface-400 uppercase tracking-[.12em]">Total Spent</p>
+          <p className="text-2xl font-bold text-brand-300 mt-2">Rs. {data.total.toLocaleString()}</p>
           <p className="text-xs text-surface-500 mt-0.5">all time</p>
         </div>
         <div className="card p-5">
-          <p className="text-xs font-medium text-surface-400 uppercase tracking-wide">Avg per Transaction</p>
+          <p className="text-xs font-medium text-surface-400 uppercase tracking-[.12em]">Avg per Transaction</p>
           <p className="text-2xl font-bold text-white mt-2">Rs. {Math.round(data.total / data.count).toLocaleString()}</p>
           <p className="text-xs text-surface-500 mt-0.5">{data.count} entries</p>
         </div>
@@ -184,8 +184,8 @@ export default function Dashboard() {
                   </Pie>
                   <Tooltip
                     formatter={(value) => `Rs. ${value.toLocaleString()}`}
-                    contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '13px' }}
-                    itemStyle={{ color: '#f8fafc' }}
+                    contentStyle={{ background: '#2a2421', border: '1px solid #554b44', borderRadius: '12px', fontSize: '13px' }}
+                    itemStyle={{ color: '#fffdf8' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -209,13 +209,13 @@ export default function Dashboard() {
           {monthlyData.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 12 }} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 12 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#3c342f" />
+                <XAxis dataKey="name" stroke="#9d8d7a" tick={{ fontSize: 12 }} />
+                <YAxis stroke="#9d8d7a" tick={{ fontSize: 12 }} />
                 <Tooltip
                   formatter={(value) => `Rs. ${value.toLocaleString()}`}
-                  contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', fontSize: '13px' }}
-                  itemStyle={{ color: '#f8fafc' }}
+                  contentStyle={{ background: '#2a2421', border: '1px solid #554b44', borderRadius: '12px', fontSize: '13px' }}
+                  itemStyle={{ color: '#fffdf8' }}
                 />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                   {monthlyData.map((_, index) => (

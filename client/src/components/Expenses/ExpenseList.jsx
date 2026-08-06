@@ -89,11 +89,12 @@ export default function ExpenseList() {
   const total = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white">Expenses</h1>
-          <p className="text-surface-400 text-sm mt-0.5">{filteredExpenses.length} transaction{filteredExpenses.length !== 1 ? 's' : ''}</p>
+          <p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Personal ledger</p>
+          <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Your expenses</h1>
+          <p className="text-surface-400 text-sm mt-1">{filteredExpenses.length} transaction{filteredExpenses.length !== 1 ? 's' : ''} in view</p>
         </div>
         <button
           onClick={() => { setEditingExpense(null); setShowForm(true); }}
@@ -106,7 +107,7 @@ export default function ExpenseList() {
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="card p-3 sm:p-4 flex items-center gap-2">
         <SearchBar onSearch={setSearch} />
         <FilterPanel filters={filters} onFilterChange={setFilters} />
       </div>
@@ -116,8 +117,8 @@ export default function ExpenseList() {
           onClick={() => setSelectedMonth('all')}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ${
             selectedMonth === 'all'
-              ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
-              : 'bg-surface-900 border border-surface-800 text-surface-400 hover:text-surface-200'
+              ? 'bg-brand-500/15 text-brand-300 border border-brand-500/25'
+              : 'bg-surface-900/60 border border-surface-800 text-surface-400 hover:text-surface-200'
           }`}
         >
           All Months
@@ -128,8 +129,8 @@ export default function ExpenseList() {
             onClick={() => setSelectedMonth(value)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 ${
               selectedMonth === value
-                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
-                : 'bg-surface-900 border border-surface-800 text-surface-400 hover:text-surface-200'
+                ? 'bg-brand-500/15 text-brand-300 border border-brand-500/25'
+                : 'bg-surface-900/60 border border-surface-800 text-surface-400 hover:text-surface-200'
             }`}
           >
             {label}
@@ -150,17 +151,17 @@ export default function ExpenseList() {
       </div>
 
       {total > 0 && (
-        <div className="card px-5 py-3.5 flex items-center justify-between">
-          <span className="text-sm text-surface-400">
+        <div className="card px-5 py-4 flex items-center justify-between border-brand-500/20 bg-gradient-to-r from-brand-500/10 to-transparent">
+          <span className="text-sm font-medium text-surface-300">
             {selectedMonth === 'all' ? 'Total' : 'Month Total'}
           </span>
-          <span className="text-lg font-bold text-white">Rs. {total.toLocaleString()}</span>
+          <span className="page-title text-2xl font-bold text-brand-300">Rs. {total.toLocaleString()}</span>
         </div>
       )}
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-7 h-7 border-2 border-surface-700 border-t-blue-500 rounded-full animate-spin" />
+          <div className="w-7 h-7 border-2 border-surface-700 border-t-brand-500 rounded-full animate-spin" />
         </div>
       ) : filteredExpenses.length === 0 ? (
         <div className="card py-16 text-center px-6">
@@ -177,18 +178,18 @@ export default function ExpenseList() {
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {filteredExpenses.map((expense) => {
             const cat = categoryStyles[expense.category] || categoryStyles.Other;
             return (
-              <div key={expense._id} className="card px-4 py-3 flex items-center gap-3 hover:border-surface-700 transition-colors duration-150 group">
-                <div className={`w-10 h-10 rounded-lg ${cat.bg} border ${cat.border} flex items-center justify-center flex-shrink-0`}>
+              <div key={expense._id} className="card px-4 sm:px-5 py-3.5 flex items-center gap-3 sm:gap-4 hover:border-brand-500/30 hover:-translate-y-px transition-all duration-150 group">
+                <div className={`w-11 h-11 rounded-2xl ${cat.bg} border ${cat.border} flex items-center justify-center flex-shrink-0`}>
                   <span className={`text-sm font-semibold ${cat.color}`}>
                     {expense.category.charAt(0)}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-white truncate">{expense.title}</h3>
+                  <h3 className="text-[15px] font-semibold text-white truncate">{expense.title}</h3>
                   <div className="flex items-center gap-2 text-xs text-surface-500 mt-0.5">
                     <span>{formatDate(expense.date)}</span>
                     <span className="text-surface-700">&#183;</span>
@@ -202,7 +203,7 @@ export default function ExpenseList() {
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-semibold text-white">Rs. {expense.amount.toLocaleString()}</p>
+                  <p className="text-base font-semibold text-white">Rs. {expense.amount.toLocaleString()}</p>
                   <span className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-medium ${cat.bg} ${cat.color} border ${cat.border}`}>
                     {expense.category}
                   </span>

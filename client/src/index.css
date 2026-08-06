@@ -4,12 +4,13 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0b1120;
-  color: #f8fafc;
+  background-color: #171312;
+  color: #fffdf8;
   min-height: 100vh;
+  background-image: radial-gradient(circle at 15% -10%, rgba(237,101,52,.16), transparent 28rem), radial-gradient(circle at 90% 15%, rgba(205,167,104,.08), transparent 25rem);
 }
 
 *, *::before, *::after {
@@ -25,20 +26,20 @@ select {
 }
 
 select option {
-  background-color: #1e293b;
-  color: #f8fafc;
+  background-color: #2a2421;
+  color: #fffdf8;
 }
 
 .input-field {
-  @apply w-full px-4 py-2.5 bg-surface-900 border border-surface-700 rounded-lg text-surface-100 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-colors duration-150;
+  @apply w-full px-4 py-2.5 bg-surface-950/50 border border-surface-700 rounded-xl text-surface-100 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition-colors duration-150;
 }
 
 .btn-primary {
-  @apply px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 active:bg-blue-700 transition-colors duration-150 text-sm;
+  @apply px-5 py-2.5 bg-brand-500 text-white font-semibold rounded-xl hover:bg-brand-400 active:bg-brand-600 transition-colors duration-150 text-sm shadow-lg shadow-brand-600/15;
 }
 
 .btn-secondary {
-  @apply px-5 py-2.5 bg-surface-800 border border-surface-700 text-surface-300 font-medium rounded-lg hover:bg-surface-700 hover:text-white transition-colors duration-150 text-sm;
+  @apply px-5 py-2.5 bg-surface-900/60 border border-surface-700 text-surface-300 font-medium rounded-xl hover:bg-surface-800 hover:text-white transition-colors duration-150 text-sm;
 }
 
 .btn-danger {
@@ -46,5 +47,8 @@ select option {
 }
 
 .card {
-  @apply bg-surface-900 border border-surface-800 rounded-xl;
+  @apply bg-surface-900/80 border border-surface-700/70 rounded-2xl shadow-xl shadow-black/10;
 }
+
+.page-title { font-family: Georgia, 'Times New Roman', serif; letter-spacing: -.035em; }
+.ledger-rule { background: linear-gradient(90deg, transparent, rgba(237,101,52,.6), transparent); height: 1px; }
