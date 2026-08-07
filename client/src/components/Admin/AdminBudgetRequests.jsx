@@ -32,16 +32,9 @@ export default function AdminBudgetRequests() {
   }, []);
 
   const review = async (req, status) => {
-    const note = window.prompt(
-      status === 'rejected'
-        ? `Reject ${req.user?.name}'s request for Rs. ${money(req.requestedAmount)}? Reason (optional):`
-        : `Approve ${req.user?.name}'s request to set budget to Rs. ${money(req.requestedAmount)}? Note (optional):`,
-      ''
-    );
-    if (note === null) return;
     setLoading(true);
     try {
-      await adminAPI.reviewBudgetRequest(req._id, status, note.trim());
+      await adminAPI.reviewBudgetRequest(req._id, status);
       toast.success(status === 'approved' ? `Budget updated for ${req.user?.name}` : 'Request rejected');
       await fetchRequests();
     } catch (err) {
@@ -99,13 +92,13 @@ export default function AdminBudgetRequests() {
 
             {req.status === 'pending' && (
               <div className="flex items-center gap-2 ml-auto">
-                <button onClick={() => review(req, 'approve')} className="btn-primary !py-2 !px-4 text-sm flex items-center gap-1.5">
+                <button onClick={() => review(req, 'approved')} className="btn-primary !py-2 !px-4 text-sm flex items-center gap-1.5">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
                   Approve
                 </button>
-                <button onClick={() => review(req, 'reject')} className="btn-secondary !py-2 !px-4 text-sm hover:!border-red-500/50 hover:!text-red-400">
+                <button onClick={() => review(req, 'rejected')} className="btn-secondary !py-2 !px-4 text-sm hover:!border-red-500/50 hover:!text-red-400">
                   Reject
                 </button>
               </div>

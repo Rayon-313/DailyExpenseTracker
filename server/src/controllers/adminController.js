@@ -102,6 +102,7 @@ export const deleteUser = async (req, res) => {
     await Promise.all([
       Expense.deleteMany({ user: user._id }),
       SavingsGoal.deleteMany({ user: user._id }),
+      BudgetRequest.deleteMany({ user: user._id }),
     ]);
     await User.findByIdAndDelete(user._id);
     res.json({ message: `User "${user.name}" and their data deleted` });
@@ -169,8 +170,10 @@ export const getGoalsAnalytics = async (req, res) => {
 
 export const getAnalytics = async (req, res) => {
   try {
-    const expenses = await Expense.find();
     const users = await User.find({ role: { $ne: 'admin' } });
+    const existingUserIds = new Set(users.map((u) => String(u._id)));
+    const allExpenses = await Expense.find();
+    const expenses = allExpenses.filter((e) => existingUserIds.has(String(e.user)));
 
     const totalUsers = users.length;
     const totalExpenses = expenses.length;

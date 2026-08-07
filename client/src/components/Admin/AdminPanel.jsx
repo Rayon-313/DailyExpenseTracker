@@ -122,7 +122,7 @@ export default function AdminPanel() {
       <div>
         <p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Admin console</p>
         <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Manage your expense tracker</h1>
-        <p className="text-surface-400 text-sm mt-1">Track platform usage, add filter options seen by all users, browse user dashboards (read-only) and review budget change requests.</p>
+        <p className="text-surface-400 text-sm mt-1">Track platform usage, add filter options seen by all users and review budget change requests.</p>
       </div>
 
       <div className="flex items-center gap-1 rounded-xl bg-surface-900/70 border border-surface-800 p-1 w-fit flex-wrap">
