@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-
-const categories = ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
-const paymentMethods = ['Cash', 'Card', 'Online', 'Other'];
+import { useFilterOptions } from '../../hooks/useFilterOptions';
 
 export default function FilterPanel({ filters, onFilterChange }) {
+  const { categories, paymentMethods } = useFilterOptions();
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef(null);
 

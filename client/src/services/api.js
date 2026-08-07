@@ -41,4 +41,16 @@ export const expenseAPI = {
   getDashboard: () => api.get('/expenses/dashboard'),
 };
 
+export const filterOptionAPI = {
+  getAll: () => api.get('/filter-options'),
+};
+
+export const adminAPI = {
+  getUsers: () => api.get('/admin/users'),
+  getUserDashboard: (id) => api.get(`/admin/users/${id}/dashboard`),
+  getUserExpenses: (id) => api.get(`/admin/users/${id}/expenses`),
+  addFilterOption: (type, label) => api.post('/admin/filter-options', { type, label }),
+  deleteFilterOption: (id) => api.delete(`/admin/filter-options/${id}`),
+};
+
 export default api;

@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { expenseAPI } from '../../services/api';
-
-const categories = ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'];
-const paymentMethods = ['Cash', 'Card', 'Online', 'Other'];
+import { useFilterOptions } from '../../hooks/useFilterOptions';
 
 const defaultForm = { title: '', amount: '', category: 'Other', paymentMethod: 'Cash', date: new Date().toISOString().split('T')[0], notes: '' };
 
 export default function ExpenseForm({ expense, onClose, onSaved }) {
+  const { categories, paymentMethods } = useFilterOptions();
   const [form, setForm] = useState(defaultForm);
   const [loading, setLoading] = useState(false);
 

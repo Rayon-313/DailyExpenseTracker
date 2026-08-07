@@ -4,6 +4,7 @@ import { expenseAPI } from '../../services/api';
 import SearchBar from './SearchBar';
 import FilterPanel from './FilterPanel';
 import ExpenseForm from './ExpenseForm';
+import ReportModal from '../Report/ReportModal';
 
 const categoryStyles = {
   Food: { color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
@@ -37,6 +38,14 @@ export default function ExpenseList() {
   const [filters, setFilters] = useState({});
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
+  const [monthly, setMonthly] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
+
+  useEffect(() => {
+    expenseAPI.getDashboard()
+      .then((res) => setMonthly(res.data))
+      .catch(() => {});
+  }, []);
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
@@ -96,16 +105,54 @@ export default function ExpenseList() {
           <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Your expenses</h1>
           <p className="text-surface-400 text-sm mt-1">{filteredExpenses.length} transaction{filteredExpenses.length !== 1 ? 's' : ''} in view</p>
         </div>
-        <button
-          onClick={() => { setEditingExpense(null); setShowForm(true); }}
-          className="btn-primary flex items-center gap-1.5"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Add Expense
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setReportOpen(true)}
+            className="btn-secondary flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            Report
+          </button>
+          <button
+            onClick={() => { setEditingExpense(null); setShowForm(true); }}
+            className="btn-primary flex items-center gap-1.5"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Add Expense
+          </button>
+        </div>
       </div>
+
+      {monthly && (
+        <div className="card px-5 py-4 border-brand-500/20 bg-gradient-to-r from-brand-500/10 to-transparent">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold uppercase tracking-[.14em] text-surface-400 whitespace-nowrap">This month</span>
+            <div className="flex-1">
+              <div className="h-2 bg-surface-800 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    monthly.budgetPercentage >= 100 ? 'bg-red-500'
+                      : monthly.budgetPercentage >= 70 ? 'bg-amber-500' : 'bg-brand-500'
+                  }`}
+                  style={{ width: `${Math.min(monthly.budgetPercentage, 100)}%` }}
+                />
+              </div>
+            </div>
+            <span className={`text-xs font-medium tabular-nums whitespace-nowrap ${
+              monthly.budgetPercentage >= 100 ? 'text-red-400'
+                : monthly.budgetPercentage >= 70 ? 'text-amber-400' : 'text-surface-300'
+            }`}>
+              {monthly.monthlyBudget > 0
+                ? `Rs. ${monthly.currentMonthTotal.toLocaleString()} / Rs. ${monthly.monthlyBudget.toLocaleString()} (${monthly.budgetPercentage}%)`
+                : `Rs. ${monthly.currentMonthTotal.toLocaleString()} spent this month`}
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="card p-3 sm:p-4 flex items-center gap-2">
         <SearchBar onSearch={setSearch} />
@@ -239,6 +286,8 @@ export default function ExpenseList() {
           onSaved={() => { setShowForm(false); setEditingExpense(null); fetchExpenses(); }}
         />
       )}
+
+      {reportOpen && <ReportModal onClose={() => setReportOpen(false)} />}
     </div>
   );
 }

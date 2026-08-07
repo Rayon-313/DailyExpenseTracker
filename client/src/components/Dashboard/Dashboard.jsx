@@ -3,6 +3,7 @@ import { expenseAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import toast from 'react-hot-toast';
+import ReportModal from '../Report/ReportModal';
 
 const COLORS = ['#ed6534', '#d6a252', '#699b80', '#a17aaf', '#5d93a8', '#d16f75', '#c37c55', '#84936b'];
 
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [budgetInput, setBudgetInput] = useState(user?.monthlyBudget || '');
   const [budgetSaving, setBudgetSaving] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     expenseAPI.getDashboard()
@@ -53,16 +55,25 @@ export default function Dashboard() {
   if (!data || data.count === 0) {
     return (
       <div className="space-y-5">
-        <div><p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Money, in context</p><h1 className="page-title text-3xl font-bold text-white">Your spending story</h1></div>
+        <div className="flex items-end justify-between gap-4">
+          <div><p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Money, in context</p><h1 className="page-title text-3xl font-bold text-white">Your spending story</h1></div>
+          <button onClick={() => setReportOpen(true)} className="btn-secondary flex items-center gap-1.5">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            Report
+          </button>
+        </div>
+        {reportOpen && <ReportModal onClose={() => setReportOpen(false)} />}
         <div className="card p-6">
           <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
           <p className="text-xs text-surface-400 mb-4">Set a budget to track your spending limit each month</p>
           <div className="flex items-center gap-3">
             <div className="relative flex-1 max-w-xs">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-surface-500">Rs.</span>
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-surface-500">Rs.</span>
               <input
                 type="number"
-                className="input-field pl-10"
+                className="input-field !pl-12"
                 placeholder="0"
                 min="0"
                 value={budgetInput}
@@ -103,7 +114,16 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div><p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Money, in context</p><h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Your spending story</h1></div>
+      <div className="flex items-end justify-between gap-4">
+        <div><p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Money, in context</p><h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Your spending story</h1></div>
+        <button onClick={() => setReportOpen(true)} className="btn-secondary flex items-center gap-1.5">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+          Report
+        </button>
+      </div>
+      {reportOpen && <ReportModal onClose={() => setReportOpen(false)} />}
 
       <div className="card p-6 border-brand-500/20 bg-gradient-to-br from-brand-500/10 to-surface-900/80">
         <div className="flex flex-col sm:flex-row sm:items-end gap-4">
@@ -117,10 +137,10 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-surface-500">Rs.</span>
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-surface-500">Rs.</span>
               <input
                 type="number"
-                className="input-field pl-10 !w-40"
+                className="input-field !pl-12 !w-40"
                 placeholder="0"
                 min="0"
                 value={budgetInput}

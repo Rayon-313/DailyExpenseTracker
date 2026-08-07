@@ -20,11 +20,9 @@ const expenseSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Education', 'Other'],
   },
   paymentMethod: {
     type: String,
-    enum: ['Cash', 'Card', 'Online', 'Other'],
     default: 'Cash',
   },
   date: {
