@@ -166,3 +166,78 @@ export const getGoalsAnalytics = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAnalytics = async (req, res) => {
+  try {
+    const expenses = await Expense.find();
+    const users = await User.find({ role: { $ne: 'admin' } });
+
+    const totalUsers = users.length;
+    const totalExpenses = expenses.length;
+    const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentMonthTotal = expenses
+      .filter((e) => e.date >= startOfMonth)
+      .reduce((s, e) => s + e.amount, 0);
+
+    const monthlyMap = new Map();
+    expenses.forEach((e) => {
+      const d = new Date(e.date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      if (!monthlyMap.has(key)) {
+        monthlyMap.set(key, {
+          key,
+          name: d.toLocaleString('default', { month: 'short', year: 'numeric' }),
+          total: 0,
+          count: 0,
+        });
+      }
+      monthlyMap.get(key).total += e.amount;
+      monthlyMap.get(key).count += 1;
+    });
+    const monthlyTotals = Array.from(monthlyMap.values()).sort((a, b) => a.key.localeCompare(b.key));
+
+    const categoryTotals = expenses.reduce((acc, e) => {
+      acc[e.category] = (acc[e.category] || 0) + e.amount;
+      return acc;
+    }, {});
+
+    const userMap = new Map(users.map((u) => [String(u._id), u]));
+    const spendByUser = {};
+    expenses.forEach((e) => {
+      const key = String(e.user);
+      spendByUser[key] = (spendByUser[key] || 0) + e.amount;
+    });
+    const topSpenders = Object.entries(spendByUser)
+      .map(([id, total]) => ({
+        name: userMap.get(id)?.name || 'Deleted user',
+        email: userMap.get(id)?.email || '',
+        total,
+      }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
+
+    const userTotals = users
+      .map((u) => ({
+        name: u.name,
+        email: u.email,
+        total: spendByUser[String(u._id)] || 0,
+      }))
+      .sort((a, b) => b.total - a.total);
+
+    res.json({
+      totalUsers,
+      totalExpenses,
+      totalSpent,
+      currentMonthTotal,
+      monthlyTotals,
+      categoryTotals,
+      topSpenders,
+      userTotals,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

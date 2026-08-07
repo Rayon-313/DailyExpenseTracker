@@ -5,6 +5,7 @@ import SearchBar from './SearchBar';
 import FilterPanel from './FilterPanel';
 import ExpenseForm from './ExpenseForm';
 import ReportModal from '../Report/ReportModal';
+import SpendingCharts from './SpendingCharts';
 
 const categoryStyles = {
   Food: { color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
@@ -95,8 +96,6 @@ export default function ExpenseList() {
     return 0;
   });
 
-  const total = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
-
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4">
@@ -159,6 +158,14 @@ export default function ExpenseList() {
         <FilterPanel filters={filters} onFilterChange={setFilters} />
       </div>
 
+      <SpendingCharts
+        expenses={filteredExpenses}
+        selectedMonth={selectedMonth}
+        filters={filters}
+        onFilterChange={setFilters}
+        onDelete={handleDelete}
+      />
+
       <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setSelectedMonth('all')}
@@ -196,15 +203,6 @@ export default function ExpenseList() {
           </select>
         </div>
       </div>
-
-      {total > 0 && (
-        <div className="card px-5 py-4 flex items-center justify-between border-brand-500/20 bg-gradient-to-r from-brand-500/10 to-transparent">
-          <span className="text-sm font-medium text-surface-300">
-            {selectedMonth === 'all' ? 'Total' : 'Month Total'}
-          </span>
-          <span className="page-title text-2xl font-bold text-brand-300">Rs. {total.toLocaleString()}</span>
-        </div>
-      )}
 
       {loading ? (
         <div className="flex justify-center py-16">

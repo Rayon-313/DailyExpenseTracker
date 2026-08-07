@@ -29,7 +29,12 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
-  updateBudget: (monthlyBudget) => api.put('/auth/budget', { monthlyBudget }),
+};
+
+export const budgetAPI = {
+  getMyRequest: () => api.get('/budget'),
+  requestChange: (requestedAmount) => api.post('/budget', { requestedAmount }),
+  cancelRequest: () => api.delete('/budget'),
 };
 
 export const expenseAPI = {
@@ -55,11 +60,12 @@ export const goalAPI = {
 };
 
 export const adminAPI = {
+  getAnalytics: () => api.get('/admin/analytics'),
   getUsers: () => api.get('/admin/users'),
   getUserDashboard: (id) => api.get(`/admin/users/${id}/dashboard`),
   getUserExpenses: (id) => api.get(`/admin/users/${id}/expenses`),
-  getGoals: () => api.get('/admin/goals'),
-  getGoalsAnalytics: () => api.get('/admin/goals/analytics'),
+  getBudgetRequests: () => api.get('/admin/budget-requests'),
+  reviewBudgetRequest: (id, status, note) => api.put(`/admin/budget-requests/${id}/review`, { status, note }),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   addFilterOption: (type, label) => api.post('/admin/filter-options', { type, label }),
   deleteFilterOption: (id) => api.delete(`/admin/filter-options/${id}`),

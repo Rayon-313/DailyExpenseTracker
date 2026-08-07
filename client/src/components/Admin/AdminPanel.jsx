@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { adminAPI, filterOptionAPI } from '../../services/api';
-import AdminGoals from './AdminGoals';
+import AdminOverview from './AdminOverview';
+import AdminBudgetRequests from './AdminBudgetRequests';
 
 const COLORS = ['#ed6534', '#d6a252', '#699b80', '#a17aaf', '#5d93a8', '#d16f75', '#c37c55', '#84936b'];
 
@@ -10,7 +11,7 @@ function formatDate(d) {
 }
 
 export default function AdminPanel() {
-  const [tab, setTab] = useState('filters');
+  const [tab, setTab] = useState('overview');
   const [options, setOptions] = useState([]);
   const [type, setType] = useState('category');
   const [label, setLabel] = useState('');
@@ -120,15 +121,18 @@ export default function AdminPanel() {
     <div className="space-y-6">
       <div>
         <p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Admin console</p>
-        <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Manage filters, users & goals</h1>
-        <p className="text-surface-400 text-sm mt-1">Add filter options seen by all users, browse user dashboards (read-only) and review savings goals.</p>
+        <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Manage your expense tracker</h1>
+        <p className="text-surface-400 text-sm mt-1">Track platform usage, add filter options seen by all users, browse user dashboards (read-only) and review budget change requests.</p>
       </div>
 
-      <div className="flex items-center gap-1 rounded-xl bg-surface-900/70 border border-surface-800 p-1 w-fit">
+      <div className="flex items-center gap-1 rounded-xl bg-surface-900/70 border border-surface-800 p-1 w-fit flex-wrap">
+        <button className={tabClass(tab === 'overview')} onClick={() => setTab('overview')}>Overview</button>
         <button className={tabClass(tab === 'filters')} onClick={() => setTab('filters')}>Filter Options</button>
         <button className={tabClass(tab === 'users')} onClick={() => { setTab('users'); loadUsers(); }}>Users</button>
-        <button className={tabClass(tab === 'goals')} onClick={() => setTab('goals')}>Goals</button>
+        <button className={tabClass(tab === 'budgets')} onClick={() => setTab('budgets')}>Budget Requests</button>
       </div>
+
+      {tab === 'overview' && <AdminOverview />}
 
       {tab === 'filters' && (
         <>
@@ -344,7 +348,7 @@ export default function AdminPanel() {
         )
       )}
 
-      {tab === 'goals' && <AdminGoals />}
+      {tab === 'budgets' && <AdminBudgetRequests />}
     </div>
   );
 }

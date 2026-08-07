@@ -39,20 +39,3 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
   res.json({ user: req.user });
 };
-
-export const updateBudget = async (req, res) => {
-  try {
-    const { monthlyBudget } = req.body;
-    if (monthlyBudget === undefined || monthlyBudget < 0) {
-      return res.status(400).json({ message: 'Please provide a valid budget amount' });
-    }
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { monthlyBudget },
-      { new: true }
-    );
-    res.json({ user, message: 'Budget updated' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};

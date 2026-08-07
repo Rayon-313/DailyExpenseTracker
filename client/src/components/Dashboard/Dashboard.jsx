@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { expenseAPI } from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import toast from 'react-hot-toast';
 import ReportModal from '../Report/ReportModal';
+import BudgetManager from './BudgetManager';
 
 const COLORS = ['#ed6534', '#d6a252', '#699b80', '#a17aaf', '#5d93a8', '#d16f75', '#c37c55', '#84936b'];
 
@@ -23,45 +23,20 @@ const insightStyle = {
 };
 
 export default function Dashboard() {
-  const { user, updateBudget } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [insights, setInsights] = useState([]);
-  const [budgetInput, setBudgetInput] = useState(user?.monthlyBudget || '');
-  const [budgetSaving, setBudgetSaving] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     expenseAPI.getDashboard()
-      .then((res) => {
-        setData(res.data);
-        if (res.data.monthlyBudget > 0 && !budgetInput) {
-          setBudgetInput(res.data.monthlyBudget);
-        }
-      })
+      .then((res) => setData(res.data))
       .catch(() => toast.error('Failed to load dashboard'))
       .finally(() => setLoading(false));
     expenseAPI.getInsights()
       .then((res) => setInsights(res.data))
       .catch(() => {});
   }, []);
-
-  const handleSaveBudget = async () => {
-    const amount = parseFloat(budgetInput);
-    if (isNaN(amount) || amount < 0) {
-      return toast.error('Please enter a valid amount');
-    }
-    setBudgetSaving(true);
-    try {
-      await updateBudget(amount);
-      setData((prev) => prev ? { ...prev, monthlyBudget: amount, budgetRemaining: amount - prev.currentMonthTotal } : prev);
-      toast.success('Budget updated');
-    } catch (err) {
-      toast.error('Failed to update budget');
-    } finally {
-      setBudgetSaving(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -86,23 +61,8 @@ export default function Dashboard() {
         {reportOpen && <ReportModal onClose={() => setReportOpen(false)} />}
         <div className="card p-6">
           <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
-          <p className="text-xs text-surface-400 mb-4">Set a budget to track your spending limit each month</p>
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 max-w-xs">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-surface-500">Rs.</span>
-              <input
-                type="number"
-                className="input-field !pl-12"
-                placeholder="0"
-                min="0"
-                value={budgetInput}
-                onChange={(e) => setBudgetInput(e.target.value)}
-              />
-            </div>
-            <button onClick={handleSaveBudget} disabled={budgetSaving} className="btn-primary">
-              {budgetSaving ? 'Saving...' : 'Save'}
-            </button>
-          </div>
+          <p className="text-xs text-surface-400 mb-4">Request a new budget limit — an admin needs to approve it before it takes effect</p>
+          <BudgetManager currentBudget={data.monthlyBudget} />
         </div>
         <div className="card py-16 text-center px-6">
           <div className="w-14 h-14 rounded-full bg-surface-800 flex items-center justify-center mx-auto mb-4">
@@ -145,31 +105,18 @@ export default function Dashboard() {
       {reportOpen && <ReportModal onClose={() => setReportOpen(false)} />}
 
       <div className="card p-6 border-brand-500/20 bg-gradient-to-br from-brand-500/10 to-surface-900/80">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-          <div className="flex-1">
-            <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
-            <p className="text-xs text-surface-400">
-              {data.monthlyBudget > 0
-                ? `Rs. ${data.budgetRemaining > 0 ? data.budgetRemaining.toLocaleString() : '0'} remaining this month`
-                : 'Set a budget to track your spending'}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-surface-500">Rs.</span>
-              <input
-                type="number"
-                className="input-field !pl-12 !w-40"
-                placeholder="0"
-                min="0"
-                value={budgetInput}
-                onChange={(e) => setBudgetInput(e.target.value)}
-              />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+            <div className="flex-1">
+              <h2 className="text-sm font-semibold text-white mb-1">Monthly Budget</h2>
+              <p className="text-xs text-surface-400">
+                {data.monthlyBudget > 0
+                  ? `Rs. ${data.budgetRemaining > 0 ? data.budgetRemaining.toLocaleString() : '0'} remaining this month`
+                  : 'Request a budget limit — an admin approves it before it applies'}
+              </p>
             </div>
-            <button onClick={handleSaveBudget} disabled={budgetSaving} className="btn-primary">
-              {budgetSaving ? 'Saving...' : 'Save'}
-            </button>
           </div>
+          <BudgetManager currentBudget={data.monthlyBudget} />
         </div>
         {data.monthlyBudget > 0 && (
           <div className="mt-4">
