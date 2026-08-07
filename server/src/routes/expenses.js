@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   getExpenses, getExpense, createExpense,
-  updateExpense, deleteExpense, getDashboard,
+  updateExpense, deleteExpense, getDashboard, getInsights,
 } from '../controllers/expenseController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.use(protect);
 router.get('/dashboard', getDashboard);
+router.get('/insights', getInsights);
 router.get('/', getExpenses);
 router.get('/:id', getExpense);
 router.post('/', createExpense);

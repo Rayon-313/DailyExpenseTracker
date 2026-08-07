@@ -7,10 +7,26 @@ import ReportModal from '../Report/ReportModal';
 
 const COLORS = ['#ed6534', '#d6a252', '#699b80', '#a17aaf', '#5d93a8', '#d16f75', '#c37c55', '#84936b'];
 
+const insightStyle = {
+  warning: {
+    iconBg: 'bg-red-500/15', iconColor: 'text-red-400', border: 'border-l-red-500/40',
+    icon: <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />,
+  },
+  success: {
+    iconBg: 'bg-emerald-500/15', iconColor: 'text-emerald-400', border: 'border-l-emerald-500/40',
+    icon: <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />,
+  },
+  info: {
+    iconBg: 'bg-brand-500/15', iconColor: 'text-brand-300', border: 'border-l-brand-500/40',
+    icon: <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />,
+  },
+};
+
 export default function Dashboard() {
   const { user, updateBudget } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [insights, setInsights] = useState([]);
   const [budgetInput, setBudgetInput] = useState(user?.monthlyBudget || '');
   const [budgetSaving, setBudgetSaving] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -25,6 +41,9 @@ export default function Dashboard() {
       })
       .catch(() => toast.error('Failed to load dashboard'))
       .finally(() => setLoading(false));
+    expenseAPI.getInsights()
+      .then((res) => setInsights(res.data))
+      .catch(() => {});
   }, []);
 
   const handleSaveBudget = async () => {
@@ -189,6 +208,37 @@ export default function Dashboard() {
           <p className="text-xs text-surface-500 mt-0.5">{data.count} entries</p>
         </div>
       </div>
+
+      {insights.length > 0 && (
+        <div className="card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-brand-500/15 text-brand-400 flex items-center justify-center">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+              </svg>
+            </div>
+            <h2 className="text-sm font-semibold text-white">Smart Insights</h2>
+          </div>
+          <div className="space-y-2.5">
+            {insights.map((insight, index) => {
+              const style = insightStyle[insight.type] || insightStyle.info;
+              return (
+                <div key={index} className={`flex items-start gap-3 p-3 rounded-xl bg-surface-900/60 border border-surface-800 border-l-4 ${style.border}`}>
+                  <div className={`w-8 h-8 rounded-lg ${style.iconBg} ${style.iconColor} flex items-center justify-center shrink-0 mt-0.5`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      {style.icon}
+                    </svg>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-white">{insight.title}</p>
+                    <p className="text-sm text-surface-400 mt-0.5">{insight.message}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card p-5">

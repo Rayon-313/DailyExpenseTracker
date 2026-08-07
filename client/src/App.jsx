@@ -5,6 +5,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ExpenseList from './components/Expenses/ExpenseList';
 import Dashboard from './components/Dashboard/Dashboard';
+import Goals from './components/Goals/Goals';
 import AdminPanel from './components/Admin/AdminPanel';
 
 function Spinner() {
@@ -53,6 +54,7 @@ export default function App() {
       <Route path="/" element={<RequireUser><Layout /></RequireUser>}>
         <Route index element={<ExpenseList />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="goals" element={<Goals />} />
       </Route>
 
       <Route path="/admin" element={<RequireAdmin><Layout /></RequireAdmin>}>

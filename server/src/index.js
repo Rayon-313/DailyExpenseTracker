@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import expenseRoutes from './routes/expenses.js';
 import adminRoutes from './routes/admin.js';
 import filterOptionRoutes from './routes/filterOptions.js';
+import goalRoutes from './routes/goals.js';
 import User from './models/User.js';
 import FilterOption from './models/FilterOption.js';
 
@@ -19,6 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/filter-options', filterOptionRoutes);
+app.use('/api/goals', goalRoutes);
 
 const DEFAULT_FILTER_OPTIONS = [
   { type: 'category', label: 'Food' },

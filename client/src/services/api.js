@@ -39,16 +39,28 @@ export const expenseAPI = {
   update: (id, data) => api.put(`/expenses/${id}`, data),
   delete: (id) => api.delete(`/expenses/${id}`),
   getDashboard: () => api.get('/expenses/dashboard'),
+  getInsights: () => api.get('/expenses/insights'),
 };
 
 export const filterOptionAPI = {
   getAll: () => api.get('/filter-options'),
 };
 
+export const goalAPI = {
+  getAll: () => api.get('/goals'),
+  create: (data) => api.post('/goals', data),
+  update: (id, data) => api.put(`/goals/${id}`, data),
+  delete: (id) => api.delete(`/goals/${id}`),
+  contribute: (id, amount) => api.post(`/goals/${id}/contribute`, { amount }),
+};
+
 export const adminAPI = {
   getUsers: () => api.get('/admin/users'),
   getUserDashboard: (id) => api.get(`/admin/users/${id}/dashboard`),
   getUserExpenses: (id) => api.get(`/admin/users/${id}/expenses`),
+  getGoals: () => api.get('/admin/goals'),
+  getGoalsAnalytics: () => api.get('/admin/goals/analytics'),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
   addFilterOption: (type, label) => api.post('/admin/filter-options', { type, label }),
   deleteFilterOption: (id) => api.delete(`/admin/filter-options/${id}`),
 };

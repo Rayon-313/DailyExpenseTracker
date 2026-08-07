@@ -2,6 +2,7 @@ import Expense from '../models/Expense.js';
 import { searchExpenses } from '../services/searchService.js';
 import { filterExpenses } from '../services/filterService.js';
 import { computeDashboard } from '../services/dashboardService.js';
+import { generateInsights } from '../services/insightsService.js';
 
 export const getExpenses = async (req, res) => {
   try {
@@ -73,6 +74,15 @@ export const getDashboard = async (req, res) => {
   try {
     const data = await computeDashboard(req.user._id);
     res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getInsights = async (req, res) => {
+  try {
+    const insights = await generateInsights(req.user._id);
+    res.json(insights);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

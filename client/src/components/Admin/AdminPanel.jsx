@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { adminAPI, filterOptionAPI } from '../../services/api';
+import AdminGoals from './AdminGoals';
 
 const COLORS = ['#ed6534', '#d6a252', '#699b80', '#a17aaf', '#5d93a8', '#d16f75', '#c37c55', '#84936b'];
 
@@ -92,6 +93,19 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteUser = async (user) => {
+    if (user.role === 'admin') return;
+    if (!window.confirm(`Delete "${user.name}"? This will permanently remove their expenses and savings goals.`)) return;
+    try {
+      await adminAPI.deleteUser(user._id);
+      toast.success(`Deleted ${user.name}`);
+      setUsers((prev) => prev.filter((u) => u._id !== user._id));
+      if (selectedUser?._id === user._id) setSelectedUser(null);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete user');
+    }
+  };
+
   const categories = options.filter((o) => o.type === 'category');
   const paymentMethods = options.filter((o) => o.type === 'paymentMethod');
 
@@ -106,13 +120,14 @@ export default function AdminPanel() {
     <div className="space-y-6">
       <div>
         <p className="text-brand-300 text-xs font-semibold uppercase tracking-[.18em] mb-2">Admin console</p>
-        <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Manage filters & users</h1>
-        <p className="text-surface-400 text-sm mt-1">Add filter options seen by all users and browse user dashboards (read-only).</p>
+        <h1 className="page-title text-3xl sm:text-4xl font-bold text-white">Manage filters, users & goals</h1>
+        <p className="text-surface-400 text-sm mt-1">Add filter options seen by all users, browse user dashboards (read-only) and review savings goals.</p>
       </div>
 
       <div className="flex items-center gap-1 rounded-xl bg-surface-900/70 border border-surface-800 p-1 w-fit">
         <button className={tabClass(tab === 'filters')} onClick={() => setTab('filters')}>Filter Options</button>
         <button className={tabClass(tab === 'users')} onClick={() => { setTab('users'); loadUsers(); }}>Users</button>
+        <button className={tabClass(tab === 'goals')} onClick={() => setTab('goals')}>Goals</button>
       </div>
 
       {tab === 'filters' && (
@@ -190,16 +205,29 @@ export default function AdminPanel() {
       {tab === 'users' && (
         selectedUser ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-3">
               <button onClick={() => setSelectedUser(null)} className="btn-secondary flex items-center gap-1.5 text-sm">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
                 Back to users
               </button>
-              <div className="text-right">
-                <h2 className="text-base font-semibold text-white">{selectedUser.name}</h2>
-                <p className="text-xs text-surface-400">{selectedUser.email}</p>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <h2 className="text-base font-semibold text-white">{selectedUser.name}</h2>
+                  <p className="text-xs text-surface-400">{selectedUser.email}</p>
+                </div>
+                {selectedUser.role !== 'admin' && (
+                  <button
+                    onClick={() => handleDeleteUser(selectedUser)}
+                    className="btn-secondary !py-2 !px-3 text-sm hover:!border-red-500/50 hover:!text-red-400 flex items-center gap-1.5"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
 
@@ -281,31 +309,42 @@ export default function AdminPanel() {
             ) : (
               <div className="divide-y divide-surface-800">
                 {users.map((user) => (
-                  <button
-                    key={user._id}
-                    onClick={() => openUser(user)}
-                    className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-surface-800/50 transition-colors duration-150"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-brand-500/15 border border-brand-500/20 flex items-center justify-center text-sm font-semibold text-brand-300 flex-shrink-0">
-                      {user.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-                      <p className="text-xs text-surface-500 truncate">{user.email}</p>
-                    </div>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full border ${user.role === 'admin' ? 'text-violet-300 bg-violet-500/10 border-violet-500/20' : 'text-surface-400 bg-surface-800 border-surface-700'}`}>
-                      {user.role}
-                    </span>
-                    <svg className="w-4 h-4 text-surface-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                  </button>
+                  <div key={user._id} className="flex items-center gap-2 px-5 py-4 hover:bg-surface-800/50 transition-colors duration-150">
+                    <button onClick={() => openUser(user)} className="flex-1 flex items-center gap-4 text-left min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-brand-500/15 border border-brand-500/20 flex items-center justify-center text-sm font-semibold text-brand-300 flex-shrink-0">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{user.name}</p>
+                        <p className="text-xs text-surface-500 truncate">{user.email}</p>
+                      </div>
+                      <span className={`text-[11px] px-2 py-0.5 rounded-full border ${user.role === 'admin' ? 'text-violet-300 bg-violet-500/10 border-violet-500/20' : 'text-surface-400 bg-surface-800 border-surface-700'}`}>
+                        {user.role}
+                      </span>
+                      <svg className="w-4 h-4 text-surface-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
+                    {user.role !== 'admin' && (
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        className="p-2 rounded-lg text-surface-500 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0"
+                        title="Delete user"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
           </div>
         )
       )}
+
+      {tab === 'goals' && <AdminGoals />}
     </div>
   );
 }
